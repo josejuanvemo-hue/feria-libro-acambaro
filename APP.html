@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Feria Nacional del Libro de Acámbaro</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-bg:    #F5EFE0;
+      --brand-dark:  #5C3317;
+      --brand-mid:   #8B5E3C;
+      --brand-peach: #D4956A;
+      --brand-amber: #C8922A;
+      --brand-cream: #EDD9A3;
+      --brand-light: #FAF5EC;
+    }
+
+    body {
+      background: var(--brand-bg);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: var(--brand-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══ HEADER ══ */
+    .header {
+      background: var(--brand-dark);
+      padding: 16px 14px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .header-logo { width: 54px; height: 54px; flex-shrink: 0; }
+    .header-text .header-sub {
+      font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase;
+      color: var(--brand-cream); opacity: 0.85;
+    }
+    .header-text h1 {
+      font-size: 16px; font-weight: 600; color: var(--brand-cream);
+      line-height: 1.2; margin: 2px 0;
+    }
+    .header-text .header-meta { font-size: 10px; color: var(--brand-peach); }
+
+    /* ══ NAV ══ */
+    .nav {
+      display: flex;
+      background: var(--brand-bg);
+      border-bottom: 1px solid #D4B896;
+      position: sticky;
+      top: 86px;
+      z-index: 4;
+    }
+    .nav-btn {
+      flex: 1; padding: 10px 4px; font-size: 11px;
+      border: none; background: transparent; cursor: pointer;
+      color: var(--brand-dark);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .nav-btn.active {
+      color: var(--brand-dark);
+      border-bottom: 3px solid var(--brand-amber);
+      background: var(--brand-light);
+      font-weight: 600;
+    }
+    .nav-icon { font-size: 18px; }
+
+    /* ══ CONTENT ══ */
+    .content { flex: 1; position: relative; }
+    .section { display: none; padding: 16px; }
+    .section.active { display: block; }
+
+    /* Search */
+    .search-bar input {
+      width: 100%; font-size: 14px; padding: 9px 14px;
+      border-radius: 20px; border: 1px solid #D4B896;
+      background: var(--brand-bg); color: var(--brand-dark);
+      margin-bottom: 14px;
+    }
+    .search-bar input::placeholder { color: #B8956A; }
+
+    /* Day label */
+    .day-label {
+      font-size: 11px; font-weight: 600; color: var(--brand-mid);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin: 12px 0 8px; padding-left: 6px;
+      border-left: 3px solid var(--brand-amber);
+    }
+
+    /* Event card */
+    .event-card {
+      background: var(--brand-bg); border: 1px solid #D4B896;
+      border-radius: 14px; padding: 12px 14px;
+      margin-bottom: 10px; display: flex; gap: 12px;
+      cursor: pointer; transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .event-card:active { background: var(--brand-cream); }
+    .event-time { font-size: 11px; color: var(--brand-mid); min-width: 44px; padding-top: 2px; line-height: 1.4; }
+    .event-title { font-size: 14px; font-weight: 600; color: var(--brand-dark); }
+    .event-place { font-size: 11px; color: var(--brand-mid); margin-top: 2px; }
+    .event-tag {
+      display: inline-block; font-size: 10px;
+      padding: 2px 9px; border-radius: 20px; margin-top: 5px;
+    }
+    .tag-conf    { background: #EDD9A3; color: #5C3317; }
+    .tag-taller  { background: #E8D5C0; color: #5C3317; }
+    .tag-present { background: rgba(212,149,106,0.25); color: #5C3317; }
+    .tag-infantil{ background: rgba(200,146,42,0.2);  color: #5C3317; }
+    .chevron { margin-left: auto; color: var(--brand-peach); font-size: 20px; align-self: center; }
+
+    /* Author card */
+    .author-card {
+      background: var(--brand-bg); border: 1px solid #D4B896;
+      border-radius: 14px; padding: 12px 14px;
+      margin-bottom: 10px; display: flex; gap: 14px;
+      align-items: center; cursor: pointer; transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .author-card:active { background: var(--brand-cream); }
+    .author-photo {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0; border: 2px solid #D4B896;
+    }
+    .av-1{background:#EDD9A3;}.av-2{background:#E8D5C0;}
+    .av-3{background:rgba(212,149,106,0.3);}.av-4{background:rgba(200,146,42,0.2);}
+
+    /* Gallery */
+    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .gallery-item { border-radius: 14px; overflow: hidden; border: 1px solid #D4B896; }
+    .gallery-img  { width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+    .gi-1{background:#EDD9A3;}.gi-2{background:#E8D5C0;}
+    .gi-3{background:rgba(212,149,106,0.3);}.gi-4{background:rgba(200,146,42,0.2);}
+    .gallery-cap { font-size: 12px; color: var(--brand-mid); padding: 6px 10px; background: var(--brand-bg); }
+
+    /* News card */
+    .news-card {
+      background: var(--brand-bg); border: 1px solid #D4B896;
+      border-radius: 14px; padding: 12px 14px;
+      margin-bottom: 10px; cursor: pointer; transition: background 0.15s;
+      display: flex; gap: 10px; align-items: flex-start;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .news-card:active { background: var(--brand-cream); }
+    .news-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 15px; }
+    .dot-conv   { background: var(--brand-amber); }
+    .dot-noticia{ background: var(--brand-dark); }
+    .dot-anuncio{ background: var(--brand-peach); }
+    .news-tag {
+      display: inline-block; font-size: 10px;
+      padding: 2px 9px; border-radius: 20px; margin-bottom: 4px;
+    }
+    .ntag-conv   { background: #EDD9A3; color: #5C3317; }
+    .ntag-noticia{ background: rgba(92,51,23,0.12); color: #5C3317; }
+    .ntag-anuncio{ background: rgba(212,149,106,0.25); color: #5C3317; }
+    .news-date  { font-size: 10px; color: var(--brand-mid); margin-bottom: 3px; }
+    .news-title { font-size: 14px; font-weight: 600; color: var(--brand-dark); line-height: 1.3; margin-bottom: 3px; }
+    .news-snippet{ font-size: 12px; color: var(--brand-mid); line-height: 1.4; }
+
+    /* ══ MODALES ══ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(60,30,10,0.55); z-index: 100;
+      align-items: flex-end;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: var(--brand-light);
+      border-radius: 22px 22px 0 0; width: 100%;
+      max-width: 480px; margin: 0 auto;
+      padding: 0 0 30px; max-height: 88vh; overflow-y: auto; position: relative;
+    }
+    .modal-handle {
+      width: 40px; height: 4px; background: #D4B896;
+      border-radius: 2px; margin: 12px auto 0;
+    }
+    .modal-close {
+      position: absolute; top: 8px; right: 16px;
+      background: none; border: none; font-size: 26px;
+      cursor: pointer; color: var(--brand-mid); line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .modal-header-band {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid #D4B896;
+      background: var(--brand-bg);
+    }
+    .modal-tag-pill {
+      display: inline-block; font-size: 11px;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 7px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: var(--brand-dark); line-height: 1.25; }
+    .modal-subtitle { font-size: 13px; color: var(--brand-mid); margin-top: 4px; }
+    .modal-body { padding: 16px 18px; }
+    .modal-section-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.7px; color: var(--brand-amber); margin-bottom: 10px;
+    }
+    .modal-info-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+    .modal-info-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+    .modal-info-text { font-size: 14px; color: var(--brand-dark); line-height: 1.55; }
+    .modal-divider { border: none; border-top: 1px solid #D4B896; margin: 16px 0; }
+
+    /* Ponentes */
+    .ponente-row {
+      display: flex; gap: 12px; align-items: center;
+      background: var(--brand-bg); border: 1px solid #D4B896;
+      border-radius: 14px; padding: 12px; margin-bottom: 10px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .ponente-row:active { background: var(--brand-cream); }
+    .ponente-photo {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; border: 1px solid #D4B896; flex-shrink: 0;
+    }
+    .ponente-name { font-size: 14px; font-weight: 600; color: var(--brand-dark); }
+    .ponente-role { font-size: 12px; color: var(--brand-mid); }
+
+    /* Author detail */
+    .author-detail-photo {
+      width: 90px; height: 90px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 42px; border: 3px solid var(--brand-peach);
+      margin: 6px auto 14px; background: var(--brand-bg);
+    }
+    .author-detail-name { font-size: 20px; font-weight: 700; text-align: center; color: var(--brand-dark); }
+    .author-detail-genre { font-size: 13px; color: var(--brand-mid); text-align: center; margin-top: 4px; margin-bottom: 16px; }
+    .semblanza { font-size: 14px; color: var(--brand-dark); line-height: 1.8; }
+    .book-item {
+      display: flex; gap: 12px; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #D4B896;
+    }
+    .book-item:last-child { border-bottom: none; }
+    .book-cover {
+      width: 36px; height: 48px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .bc-1{background:#EDD9A3;}.bc-2{background:#E8D5C0;}.bc-3{background:rgba(212,149,106,0.3);}
+    .book-title { font-size: 14px; font-weight: 600; color: var(--brand-dark); }
+    .book-year  { font-size: 12px; color: var(--brand-mid); }
+
+    /* Noticia detalle */
+    .news-body-full { font-size: 14px; color: var(--brand-dark); line-height: 1.85; white-space: pre-line; }
+    .news-req-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 12px; margin-bottom: 8px;
+      background: var(--brand-bg); border-radius: 12px;
+      border: 1px solid #D4B896; font-size: 14px; color: var(--brand-dark);
+    }
+    .req-icon { flex-shrink: 0; font-size: 16px; }
+    .cta-btn {
+      display: block; width: 100%; padding: 14px;
+      text-align: center; background: var(--brand-amber);
+      color: #FAF5EC; border: none; border-radius: 24px;
+      font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 18px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cta-btn:active { opacity: 0.85; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <svg class="header-logo" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="26" cy="26" r="25" fill="#FAF5EC" stroke="#D4B896" stroke-width="1"/>
+      <path d="M12 34 Q26 31 26 31 Q26 31 40 34 L40 22 Q26 19 26 19 Q26 19 12 22 Z" fill="none" stroke="#5C3317" stroke-width="1.2"/>
+      <line x1="26" y1="19" x2="26" y2="34" stroke="#5C3317" stroke-width="0.8"/>
+      <ellipse cx="26" cy="27" rx="6" ry="4.5" fill="#C8922A" opacity="0.9"/>
+      <path d="M22 26 Q26 24 30 26" stroke="#5C3317" stroke-width="0.8" fill="none"/>
+      <path d="M26 22 Q20 14 17 10" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M26 22 Q32 14 35 10" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M26 22 Q18 16 14 15" stroke="#3B6D11" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M26 22 Q34 16 38 15" stroke="#3B6D11" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M26 22 Q23 13 23 9"  stroke="#3B6D11" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M26 22 Q29 13 29 9"  stroke="#3B6D11" stroke-width="1.2" stroke-linecap="round"/>
+      <path id="topArc" d="M 8 26 A 18 18 0 0 1 44 26" fill="none"/>
+      <text font-size="4.2" fill="#5C3317" font-family="serif" letter-spacing="0.5">
+        <textPath href="#topArc" startOffset="8%">FERIA NACIONAL DEL LIBRO</textPath>
+      </text>
+      <path id="botArc" d="M 12 34 A 18 18 0 0 0 40 34" fill="none"/>
+      <text font-size="4" fill="#5C3317" font-family="serif" letter-spacing="0.3">
+        <textPath href="#botArc" startOffset="18%">de Acámbaro</textPath>
+      </text>
+    </svg>
+    <div class="header-text">
+      <div class="header-sub">II edición · Acámbaro, Gto.</div>
+      <h1>Feria Nacional<br>del Libro</h1>
+      <div class="header-meta">11, 12 y 13 de diciembre · Plaza Cívica</div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('agenda',this)"><span class="nav-icon">📅</span>Agenda</button>
+    <button class="nav-btn" onclick="showTab('autores',this)"><span class="nav-icon">✍️</span>Autores</button>
+    <button class="nav-btn" onclick="showTab('galeria',this)"><span class="nav-icon">🖼️</span>Galería</button>
+    <button class="nav-btn" onclick="showTab('noticias',this)"><span class="nav-icon">📰</span>Noticias</button>
+  </div>
+
+  <div class="content">
+
+    <!-- AGENDA -->
+    <div class="section active" id="agenda">
+      <div class="search-bar"><input type="text" placeholder="Buscar evento..." oninput="filtrarEventos(this.value)"></div>
+      <div id="agenda-lista">
+        <div class="day-label">Jueves 11 de diciembre</div>
+        <div class="event-card" onclick="openEvent('inauguracion')">
+          <div class="event-time">10:00<br>am</div>
+          <div style="flex:1"><div class="event-title">Ceremonia inaugural</div><div class="event-place">Foro principal · Plaza Cívica</div><span class="event-tag tag-conf">Conferencia</span></div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="event-card" onclick="openEvent('taller_narrativa')">
+          <div class="event-time">12:00<br>pm</div>
+          <div style="flex:1"><div class="event-title">Taller de narrativa para jóvenes</div><div class="event-place">Carpa B · Cupo limitado</div><span class="event-tag tag-taller">Taller</span></div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="day-label">Viernes 12 de diciembre</div>
+        <div class="event-card" onclick="openEvent('presentacion_memorias')">
+          <div class="event-time">11:00<br>am</div>
+          <div style="flex:1"><div class="event-title">Presentación: "Memorias del Bajío"</div><div class="event-place">Foro A · Entrada libre</div><span class="event-tag tag-present">Presentación</span></div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="event-card" onclick="openEvent('cuentacuentos')">
+          <div class="event-time">4:00<br>pm</div>
+          <div style="flex:1"><div class="event-title">Cuentacuentos para niños</div><div class="event-place">Jardín de lectura · Entrada libre</div><span class="event-tag tag-infantil">Infantil</span></div>
+          <div class="chevron">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTORES -->
+    <div class="section" id="autores">
+      <div class="search-bar"><input type="text" placeholder="Buscar autor..."></div>
+      <div class="author-card" onclick="openAuthor('martha')"><div class="author-photo av-1">👩‍🦱</div><div style="flex:1"><div class="event-title">Martha Rojas</div><div class="event-place">Narrativa · Literatura infantil</div></div><div class="chevron">›</div></div>
+      <div class="author-card" onclick="openAuthor('jorge')"><div class="author-photo av-2">👨‍🦳</div><div style="flex:1"><div class="event-title">Jorge Alvarado</div><div class="event-place">Poesía · Ensayo</div></div><div class="chevron">›</div></div>
+      <div class="author-card" onclick="openAuthor('carmen')"><div class="author-photo av-3">👩</div><div style="flex:1"><div class="event-title">Carmen Luna</div><div class="event-place">Novela histórica</div></div><div class="chevron">›</div></div>
+      <div class="author-card" onclick="openAuthor('roberto')"><div class="author-photo av-4">🧔</div><div style="flex:1"><div class="event-title">Roberto Cervantes</div><div class="event-place">Cuento · Crónica urbana</div></div><div class="chevron">›</div></div>
+    </div>
+
+    <!-- GALERÍA -->
+    <div class="section" id="galeria">
+      <div class="gallery-grid">
+        <div class="gallery-item"><div class="gallery-img gi-1">📚</div><div class="gallery-cap">Inauguración 2024</div></div>
+        <div class="gallery-item"><div class="gallery-img gi-2">🎤</div><div class="gallery-cap">Conferencia magistral</div></div>
+        <div class="gallery-item"><div class="gallery-img gi-3">✍️</div><div class="gallery-cap">Taller de escritura</div></div>
+        <div class="gallery-item"><div class="gallery-img gi-4">🏛️</div><div class="gallery-cap">Plaza Cívica</div></div>
+      </div>
+    </div>
+
+    <!-- NOTICIAS -->
+    <div class="section" id="noticias">
+      <div class="news-card" onclick="openNews('convocatoria_talleres')">
+        <div><div class="news-dot dot-conv" style="margin-top:15px"></div></div>
+        <div style="flex:1"><span class="news-tag ntag-conv">Convocatoria</span><div class="news-date">5 de octubre, 2025</div><div class="news-title">Convocatoria abierta para talleres literarios</div><div class="news-snippet">Jóvenes de 15 a 25 años pueden inscribirse de forma gratuita...</div></div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="news-card" onclick="openNews('cartel_autores')">
+        <div><div class="news-dot dot-noticia" style="margin-top:15px"></div></div>
+        <div style="flex:1"><span class="news-tag ntag-noticia">Noticia</span><div class="news-date">20 de octubre, 2025</div><div class="news-title">Se anuncia el cartel oficial de autores</div><div class="news-snippet">Más de 40 escritores de todo el país confirmaron su participación...</div></div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="news-card" onclick="openNews('foro_nuevo')">
+        <div><div class="news-dot dot-anuncio" style="margin-top:15px"></div></div>
+        <div style="flex:1"><span class="news-tag ntag-anuncio">Anuncio</span><div class="news-date">1 de octubre, 2025</div><div class="news-title">Nuevo foro al aire libre para esta edición</div><div class="news-snippet">Estrena foro exterior con capacidad para 500 personas...</div></div>
+        <div class="chevron">›</div>
+      </div>
+      <div class="news-card" onclick="openNews('convocatoria_stand')">
+        <div><div class="news-dot dot-conv" style="margin-top:15px"></div></div>
+        <div style="flex:1"><span class="news-tag ntag-conv">Convocatoria</span><div class="news-date">28 de septiembre, 2025</div><div class="news-title">Convocatoria para expositores y editoriales</div><div class="news-snippet">Editoriales y librerías pueden solicitar su stand hasta el 15 de octubre...</div></div>
+        <div class="chevron">›</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- MODAL EVENTO -->
+  <div class="modal-overlay" id="modal-event" onclick="cerrarSiFondo(event,'modal-event')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeModal('modal-event')">×</button>
+      <div class="modal-header-band">
+        <div class="modal-tag-pill" id="ev-tag"></div>
+        <div class="modal-title" id="ev-title"></div>
+        <div class="modal-subtitle" id="ev-subtitle"></div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section-label">Detalles</div>
+        <div class="modal-info-row"><span class="modal-info-icon">🕐</span><div class="modal-info-text" id="ev-time"></div></div>
+        <div class="modal-info-row"><span class="modal-info-icon">📍</span><div class="modal-info-text" id="ev-place"></div></div>
+        <div class="modal-info-row"><span class="modal-info-icon">ℹ️</span><div class="modal-info-text" id="ev-desc"></div></div>
+        <hr class="modal-divider">
+        <div class="modal-section-label" id="ponentes-label"></div>
+        <div id="ev-ponentes"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AUTOR -->
+  <div class="modal-overlay" id="modal-author" onclick="cerrarSiFondo(event,'modal-author')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeModal('modal-author')">×</button>
+      <div class="modal-body">
+        <div class="author-detail-photo" id="au-photo"></div>
+        <div class="author-detail-name" id="au-name"></div>
+        <div class="author-detail-genre" id="au-genre"></div>
+        <div class="modal-section-label">Semblanza</div>
+        <div class="semblanza" id="au-bio"></div>
+        <hr class="modal-divider">
+        <div class="modal-section-label">Obras destacadas</div>
+        <div id="au-books"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NOTICIA -->
+  <div class="modal-overlay" id="modal-news" onclick="cerrarSiFondo(event,'modal-news')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeModal('modal-news')">×</button>
+      <div class="modal-header-band">
+        <div class="modal-tag-pill" id="nw-tag"></div>
+        <div class="modal-title" id="nw-title"></div>
+        <div class="modal-subtitle" id="nw-date"></div>
+      </div>
+      <div class="modal-body">
+        <div class="news-body-full" id="nw-body"></div>
+        <div id="nw-req-wrap" style="display:none">
+          <hr class="modal-divider">
+          <div class="modal-section-label">Requisitos</div>
+          <div id="nw-requisitos"></div>
+        </div>
+        <div id="nw-bases-wrap" style="display:none">
+          <hr class="modal-divider">
+          <div class="modal-section-label">Bases</div>
+          <div class="news-body-full" id="nw-bases"></div>
+        </div>
+        <div id="nw-cta-wrap" style="display:none">
+          <button class="cta-btn" id="nw-cta"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+const events = {
+  inauguracion:{tag:'Conferencia',tagClass:'tag-conf',title:'Ceremonia inaugural',subtitle:'Apertura oficial de la II Feria Nacional del Libro',time:'Jueves 11 de diciembre · 10:00 am – 12:00 pm',place:'Foro principal · Plaza Cívica y Cultural Miguel Hidalgo y Costilla',desc:'Acto protocolario de apertura con autoridades municipales, estatales y la comunidad literaria. Habrá música en vivo y palabras de los organizadores.',ponentesLabel:'Participantes',ponentes:[{emoji:'👩‍🦱',color:'av-1',name:'Martha Rojas',role:'Madrina de la edición 2025',key:'martha'},{emoji:'👨‍🦳',color:'av-2',name:'Jorge Alvarado',role:'Lectura inaugural de poesía',key:'jorge'}]},
+  taller_narrativa:{tag:'Taller',tagClass:'tag-taller',title:'Taller de narrativa para jóvenes',subtitle:'Técnicas de escritura creativa aplicadas',time:'Jueves 11 de diciembre · 12:00 pm – 2:00 pm',place:'Carpa B · Cupo limitado a 25 personas',desc:'Un taller práctico donde los participantes explorarán técnicas de creación de personajes, estructura narrativa y voz del narrador. Llevar cuaderno y pluma.',ponentesLabel:'Quien imparte',ponentes:[{emoji:'👩',color:'av-3',name:'Carmen Luna',role:'Instructora · Novelista histórica',key:'carmen'}]},
+  presentacion_memorias:{tag:'Presentación',tagClass:'tag-present',title:'Presentación: "Memorias del Bajío"',subtitle:'Nuevo libro de Carmen Luna',time:'Viernes 12 de diciembre · 11:00 am – 12:30 pm',place:'Foro A · Entrada libre',desc:'Presentación de la más reciente novela histórica de Carmen Luna. Habrá sesión de preguntas y firma de libros al finalizar.',ponentesLabel:'Presenta',ponentes:[{emoji:'👩',color:'av-3',name:'Carmen Luna',role:'Autora',key:'carmen'},{emoji:'🧔',color:'av-4',name:'Roberto Cervantes',role:'Presentador invitado',key:'roberto'}]},
+  cuentacuentos:{tag:'Infantil',tagClass:'tag-infantil',title:'Cuentacuentos para niños',subtitle:'Para pequeños lectores de 4 a 10 años',time:'Viernes 12 de diciembre · 4:00 pm – 5:30 pm',place:'Jardín de lectura · Entrada libre',desc:'Una tarde mágica de cuentos narrados en voz alta. Se recomienda llegar 20 minutos antes. El jardín cuenta con sombra y área de picnic.',ponentesLabel:'Narradora',ponentes:[{emoji:'👩‍🦱',color:'av-1',name:'Martha Rojas',role:'Narradora · Literatura infantil',key:'martha'}]}
+};
+
+const authors = {
+  martha:{emoji:'👩‍🦱',color:'av-1',name:'Martha Rojas',genre:'Narrativa · Literatura infantil',bio:'Nacida en Celaya, Guanajuato en 1978, Martha Rojas es una de las voces más reconocidas de la literatura infantil mexicana. Estudió Letras Hispánicas en la UNAM y realizó una maestría en Escritura Creativa en Barcelona. Ha publicado más de doce libros para niños y jóvenes, traducidos a seis idiomas.',books:[{emoji:'🌿',color:'bc-1',title:'La niña del río verde',year:'2021'},{emoji:'🦋',color:'bc-1',title:'El secreto de los árboles',year:'2018'},{emoji:'🌙',color:'bc-1',title:'Noches de cuentos',year:'2015'}]},
+  jorge:{emoji:'👨‍🦳',color:'av-2',name:'Jorge Alvarado',genre:'Poesía · Ensayo',bio:'Poeta y ensayista originario de Querétaro (1965). Premio Nacional de Poesía Aguascalientes 2009. Su obra transita entre la lírica contemplativa y el ensayo filosófico, siempre con la geografía del centro de México como telón de fondo.',books:[{emoji:'📖',color:'bc-2',title:'Voces del Bajío',year:'2022'},{emoji:'✨',color:'bc-2',title:'El tiempo quieto',year:'2017'},{emoji:'🏔️',color:'bc-2',title:'Altiplano',year:'2010'}]},
+  carmen:{emoji:'👩',color:'av-3',name:'Carmen Luna',genre:'Novela histórica',bio:'Escritora guanajuatense nacida en Acámbaro (1982). Su trilogía del Bajío ha sido aclamada como una de las obras de ficción histórica más importantes de la literatura mexicana reciente. Doctora en Literatura Latinoamericana por la UNAM.',books:[{emoji:'🏛️',color:'bc-3',title:'Memorias del Bajío',year:'2025'},{emoji:'⚔️',color:'bc-1',title:'La tierra que nos vio',year:'2020'},{emoji:'🕯️',color:'bc-2',title:'Entre sombras y luz',year:'2016'}]},
+  roberto:{emoji:'🧔',color:'av-4',name:'Roberto Cervantes',genre:'Cuento · Crónica urbana',bio:'Nacido en la Ciudad de México en 1975. Premio Xavier Villaurrutia de cuento 2018. Columnista de El Universal y conductor del podcast literario "Barrio de Letras". Sus cuentos han aparecido en antologías en más de diez países.',books:[{emoji:'🏙️',color:'bc-2',title:'La ciudad que invento',year:'2023'},{emoji:'🚇',color:'bc-1',title:'Metro, últimas noticias',year:'2019'},{emoji:'🎙️',color:'bc-3',title:'Crónicas de nadie',year:'2013'}]}
+};
+
+const noticias = {
+  convocatoria_talleres:{tag:'Convocatoria',tagClass:'ntag-conv',title:'Convocatoria para talleres literarios 2025',date:'5 de octubre de 2025',body:'La Feria Nacional del Libro de Acámbaro invita a jóvenes de 15 a 25 años a participar en sus talleres de escritura creativa, poesía y narrativa visual.\n\nLos talleres son completamente gratuitos y se llevarán a cabo durante los días 11, 12 y 13 de diciembre en la Plaza Cívica y Cultural Miguel Hidalgo y Costilla. Cada taller tiene una duración de dos horas y cupo limitado a 25 participantes.',requisitos:[{icon:'🪪',text:'Identificación oficial vigente (INE, pasaporte o credencial escolar)'},{icon:'📝',text:'Llenar el formulario de inscripción en línea o en las oficinas de la feria'},{icon:'📓',text:'Llevar cuaderno y pluma al taller'},{icon:'✅',text:'No se requiere experiencia previa en escritura'}],bases:'Las inscripciones están abiertas del 5 al 30 de octubre de 2025. Los participantes seleccionados recibirán confirmación por correo electrónico antes del 5 de noviembre.\n\nCada participante puede inscribirse a un máximo de dos talleres. En caso de no poder asistir, deberá notificarlo con al menos 48 horas de anticipación.',cta:'Inscribirse al taller'},
+  cartel_autores:{tag:'Noticia',tagClass:'ntag-noticia',title:'Se anuncia el cartel oficial de autores',date:'20 de octubre de 2025',body:'La organización de la Feria Nacional del Libro de Acámbaro confirmó hoy la participación de más de 40 escritores provenientes de 18 estados de la República Mexicana, así como dos autores invitados internacionales.\n\nEntre los nombres destacados se encuentran Martha Rojas, Jorge Alvarado, Carmen Luna y Roberto Cervantes, quienes participarán en conferencias, talleres y presentaciones de libros durante los tres días del evento.\n\nEl programa completo se publicará en los próximos días a través de todos los canales oficiales.',requisitos:null,bases:null,cta:null},
+  foro_nuevo:{tag:'Anuncio',tagClass:'ntag-anuncio',title:'Nuevo foro al aire libre para la edición 2025',date:'1 de octubre de 2025',body:'En respuesta a la creciente demanda de años anteriores, la II Feria Nacional del Libro de Acámbaro estrena un foro al aire libre con capacidad para 500 personas en la Plaza Cívica y Cultural Miguel Hidalgo y Costilla.\n\nEl nuevo espacio contará con sistema de audio profesional, iluminación nocturna y cubierta parcial. Será sede de conferencias magistrales, presentaciones estelares y el concierto de clausura.\n\nLos eventos en el foro exterior serán de entrada libre sujeta a disponibilidad.',requisitos:null,bases:null,cta:null},
+  convocatoria_stand:{tag:'Convocatoria',tagClass:'ntag-conv',title:'Convocatoria para expositores y editoriales',date:'28 de septiembre de 2025',body:'La Feria Nacional del Libro de Acámbaro abre su convocatoria para editoriales, librerías, distribuidoras y proyectos editoriales independientes que deseen participar como expositores.\n\nSe contará con espacios de diferentes dimensiones, desde mesas individuales para autores independientes hasta stands de mayor tamaño para sellos editoriales.',requisitos:[{icon:'🏢',text:'Persona física o moral con actividad editorial, librera o distribuidora'},{icon:'📄',text:'RFC activo y comprobante de actividad en el sector del libro'},{icon:'📦',text:'El catálogo debe incluir al menos 60% de títulos de autores mexicanos'},{icon:'💳',text:'Pago anticipado del 50% del costo del stand al confirmar participación'}],bases:'Las solicitudes se reciben del 28 de septiembre al 15 de octubre de 2025. La asignación de espacios se notificará el 25 de octubre.\n\nEl costo de los stands varía según dimensión y ubicación. La feria no se hace responsable por mercancía robada o extraviada.',cta:'Solicitar información de stands'}
+};
+
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function openEvent(key){
+  const e=events[key];
+  const t=document.getElementById('ev-tag');
+  t.textContent=e.tag; t.className='modal-tag-pill '+e.tagClass;
+  document.getElementById('ev-title').textContent=e.title;
+  document.getElementById('ev-subtitle').textContent=e.subtitle;
+  document.getElementById('ev-time').textContent=e.time;
+  document.getElementById('ev-place').textContent=e.place;
+  document.getElementById('ev-desc').textContent=e.desc;
+  document.getElementById('ponentes-label').textContent=e.ponentesLabel;
+  document.getElementById('ev-ponentes').innerHTML=e.ponentes.map(p=>`
+    <div class="ponente-row" onclick="closeModal('modal-event');openAuthor('${p.key}')">
+      <div class="ponente-photo ${p.color}">${p.emoji}</div>
+      <div style="flex:1"><div class="ponente-name">${p.name}</div><div class="ponente-role">${p.role}</div></div>
+      <div class="chevron">›</div>
+    </div>`).join('');
+  document.getElementById('modal-event').classList.add('open');
+}
+
+function openAuthor(key){
+  const a=authors[key];
+  const ph=document.getElementById('au-photo');
+  ph.className='author-detail-photo '+a.color; ph.textContent=a.emoji;
+  document.getElementById('au-name').textContent=a.name;
+  document.getElementById('au-genre').textContent=a.genre;
+  document.getElementById('au-bio').textContent=a.bio;
+  document.getElementById('au-books').innerHTML=a.books.map(b=>`
+    <div class="book-item">
+      <div class="book-cover ${b.color}">${b.emoji}</div>
+      <div><div class="book-title">${b.title}</div><div class="book-year">${b.year}</div></div>
+    </div>`).join('');
+  document.getElementById('modal-author').classList.add('open');
+}
+
+function openNews(key){
+  const n=noticias[key];
+  const t=document.getElementById('nw-tag');
+  t.textContent=n.tag; t.className='modal-tag-pill '+n.tagClass;
+  document.getElementById('nw-title').textContent=n.title;
+  document.getElementById('nw-date').textContent=n.date;
+  document.getElementById('nw-body').textContent=n.body;
+  const rw=document.getElementById('nw-req-wrap');
+  if(n.requisitos){rw.style.display='block';document.getElementById('nw-requisitos').innerHTML=n.requisitos.map(r=>`<div class="news-req-item"><span class="req-icon">${r.icon}</span><span>${r.text}</span></div>`).join('');}
+  else rw.style.display='none';
+  const bw=document.getElementById('nw-bases-wrap');
+  if(n.bases){bw.style.display='block';document.getElementById('nw-bases').textContent=n.bases;}
+  else bw.style.display='none';
+  const cw=document.getElementById('nw-cta-wrap');
+  if(n.cta){cw.style.display='block';document.getElementById('nw-cta').textContent=n.cta;}
+  else cw.style.display='none';
+  document.getElementById('modal-news').classList.add('open');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function cerrarSiFondo(e,id){
+  if(e.target===document.getElementById(id)) closeModal(id);
+}
+
+function filtrarEventos(q){
+  const cards=document.querySelectorAll('.event-card');
+  cards.forEach(c=>{
+    const txt=c.innerText.toLowerCase();
+    c.style.display=txt.includes(q.toLowerCase())?'flex':'none';
+  });
+}
+</script>
+</body>
+</html>
